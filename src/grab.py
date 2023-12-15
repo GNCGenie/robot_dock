@@ -1,20 +1,29 @@
 import numpy as np
 from time import sleep
-from localisation_aruco import getPosition
-from arm_angle_calc import getAngles, transform
-from armcontrol import ArmMove
+from localisation_aruco import get_position
+from arm_angle_calc import get_angles, transform
+from Arm_Lib import Arm_Device
 
-home = np.array([np.pi/2,.0,np.pi/2,np.pi/2,np.pi/2])
-print("Home Postion : ", home)
-ArmMove(home)
-sleep(5)
+Arm = Arm_Device()
+Arm.Arm_reset()
+sleep(0.1)
 
-pos = np.array([0.35,0.0,0.0])
-#pos = getPosition()
-#print("Target Position : ", pos)
-angles = getAngles(pos)
-angles = np.array(angles)
+home = np.array([90,90,90,90,90,0]) # Upright position
+Arm.Arm_serial_servo_write6_array(home, 1000) # Return arm to home position
+sleep(1)
 
-print("Arm angles   : ", angles)
-print("Arm final position : ", transform(angles))
-ArmMove(angles)
+pos = get_position() # Position w.r.t. Camera origin
+pos[1],pos[2] = pos[2], pos[1] # Switch Y & Z axis
+pos[0] = -pos[0] # Flip X axis sign
+pos += [0.03, 0.04, -0.08] # Position of camera w.r.t. Robot Arm Base
+print("Target Position : ", pos)
+
+anglesrad = get_angles(pos) # Minimise distance between arm and target
+angles = np.array(anglesrad) * 180/np.pi # Robot arm takes angles in degrees
+print("Going to position : " , transform(anglesrad))
+print("Arm angles (ang) : ", angles)
+
+input("Press any key to go to position...")
+Arm.Arm_serial_servo_write6_array(angles, 2000)
+input("Press any key to close arm...")
+Arm.Arm_serial_servo_write(6, 180, 1000)

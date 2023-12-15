@@ -1,8 +1,11 @@
 import numpy as np
 from scipy.optimize import minimize
 from scipy.optimize import Bounds
+from copy import deepcopy
 
-def transform(theta):
+def transform(inangles):
+    theta = deepcopy(inangles)
+    # Theta is in Radians
     l1 = 0.08285
     l2 = 0.08295
     l3 = 0.1842
@@ -11,7 +14,6 @@ def transform(theta):
     d = np.array([0, 0, 0, 0, l3])
     theta[2] = theta[2] - np.pi/2
     theta[4] = theta[4] - np.pi/2
-
 
     T05 = np.eye(4)
 
@@ -34,20 +36,20 @@ def transform(theta):
 
     return T05[0:3,3]
 
-def getAngles(position):
+def get_angles(position):
 
     def loss(theta):
         return np.linalg.norm(transform(theta) - position)
 
-    lower = [.0,    .0, np.pi/2, np.pi/2, .0]
-    upper = [np.pi, .0, np.pi/2, np.pi/2, np.pi]
+    lower = [.0,    0.10*np.pi, 0.10*np.pi, 0.10*np.pi, .0,    .0]
+    upper = [np.pi, 0.90*np.pi, 0.90*np.pi, 0.90*np.pi, np.pi, .0]
 
-    init_guess = np.ones(5)*np.pi/2
+    init_guess = np.ones(6)*np.pi/2
     result = minimize(loss, init_guess, method='SLSQP',
             bounds = Bounds(lb=lower,ub=upper), tol=1e-9,
-            options={'disp': False})
+            options={'disp': True})
 
-    return result.x
+    return result.x # Theta is in Radians
 
 #targetpos = np.random.rand(3)/5
 #print(targetpos)
