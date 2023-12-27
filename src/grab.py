@@ -19,11 +19,11 @@ pos += [0.03, 0.04, -0.08] # Position of camera w.r.t. Robot Arm Base
 print("Target Position : ", pos)
 
 anglesrad = get_angles(pos) # Minimise distance between arm and target
-angles = np.array(anglesrad) * 180/np.pi # Robot arm takes angles in degrees
+anglesdeg = np.array(anglesrad) * 180/np.pi # Robot arm takes angles in degrees
 print("Going to position : " , transform(anglesrad))
-print("Arm angles (ang) : ", angles)
+print("Arm angles (ang) : ", anglesdeg)
 
 input("Press any key to go to position...")
-Arm.Arm_serial_servo_write6_array(angles, 2000)
+Arm.Arm_serial_servo_write6_array(anglesdeg, 2000)
 input("Press any key to close arm...")
 Arm.Arm_serial_servo_write(6, 180, 1000)
