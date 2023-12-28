@@ -45,6 +45,14 @@ anglesdeg = np.array(anglesrad) * 180/np.pi # Robot arm takes angles in degrees
 print("Going to position : " , transform(anglesrad))
 print("Arm angles (deg) : ", anglesdeg)
 
+# Build some safeguard so robot doesn't hit itself or dive under horizon
+if transform(anglesrad)[2] < -0.1: # Arm should not dive under horizon
+    print("Arm going under horizon, exit")
+    exit()
+if norm(transform(anglesrad)) < 0.05: # Arm should not be too close to base
+    print("Arm too close to base, exit")
+    exit()
+
 input("Press any key to go to position...")
 Arm.Arm_serial_servo_write6_array(anglesdeg, 2000) # Go to target position
 input("Press any key to close arm...")

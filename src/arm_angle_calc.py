@@ -49,6 +49,7 @@ def get_angles(position):
         return np.linalg.norm(transform(theta) - position)
 
     # Bounds on angles the arm can take
+    # WARNING : CHANGING THESE VALUES CAN CAUSE ROBOT TO SLAP ITSELF
     lower = [.0,    0.10*np.pi, 0.10*np.pi, 0.10*np.pi, .0,    .0]
     upper = [np.pi, 0.90*np.pi, 0.90*np.pi, 0.90*np.pi, np.pi, .0]
 
